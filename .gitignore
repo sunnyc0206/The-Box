@@ -1,0 +1,34 @@
+# Compiled class files and build artifacts
+target/
+*.jar
+*.war
+*.zip
+*.tar.gz
+
+# IDE specific files
+.idea/
+.classpath
+.project
+.settings/
+.vscode/
+*.jar
+
+# Maven wrapper files (optional, but good practice to ignore)
+.mvn/wrapper/maven-wrapper.jar
+
+# Log files
+*.log
+
+# Windows and macOS system files
+Thumbs.db
+.DS_Store
+
+# Spring-specific files
+/src/main/resources/application.properties
+/src/main/resources/application.yml
+/src/main/resources/application-*.properties
+/src/main/resources/application-*.yml
+
+# Hidden credentials/local configuration (important for security)
+.env
+local.properties

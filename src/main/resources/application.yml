@@ -1,0 +1,36 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: thebox-backend
+  
+  datasource:
+    url: jdbc:h2:mem:theboxdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  
+  cache:
+    type: simple
+
+# Logging
+logging:
+  level:
+    com.thebox: DEBUG
+    org.springframework.web: INFO 
