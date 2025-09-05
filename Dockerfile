@@ -30,8 +30,8 @@ RUN apk add --no-cache curl
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Copy the built JAR from builder stage
-COPY --from=builder /app/target/p2p-1.0-SNAPSHOT.jar app.jar
+# Copy the built JAR from builder stage with the correct name
+COPY --from=builder /app/target/thebox-backend-1.0.0.jar app.jar
 
 # Expose port
 EXPOSE 8080
@@ -46,4 +46,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Run the application
-CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"] 
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
