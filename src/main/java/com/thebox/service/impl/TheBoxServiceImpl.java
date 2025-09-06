@@ -49,14 +49,7 @@ public class TheBoxServiceImpl implements TheBoxService {
         logger.info("Starting to fetch and update IPTV channels from global sources...");
 
         try {
-            // Clear existing data
-            channelRepository.deleteAll();
-            countryRepository.deleteAll();
-
-            // Fetch comprehensive global data first
             fetchComprehensiveGlobalData();
-
-            // Then fetch and process streams
             fetchChannelsFromGlobalStreams();
 
             logger.info("Successfully fetched and updated IPTV channels from global sources");
@@ -124,25 +117,41 @@ public class TheBoxServiceImpl implements TheBoxService {
         }
     }
 
-private void createCountryFromMetadata(JsonNode countryNode) {
-    try {
-        String code = countryNode.get("code").asText();
-        String name = countryNode.get("name").asText();
+    private void createCountryFromMetadata(JsonNode countryNode) {
+        try {
+            String code = countryNode.get("code").asText();
+            String name = countryNode.get("name").asText();
+            String flagUrl = countryNode.has("image") ? countryNode.get("image").asText() : null;
 
-        // Safely get the image URL, defaulting to null if the key is missing
-        String imageNode = (countryNode.get("image").asText());
-        String flagUrl = (imageNode != null) ? imageNode : null;
-
-        if (!countryRepository.existsByCode(code)) {
-            Country country = new Country(name, code);
-            country.setFlagUrl(flagUrl);
-            countryRepository.save(country);
-//            logger.debug("Created country: {} ({})", name, code);
+            Optional<Country> existingCountryOpt = countryRepository.findByCode(code);
+            if (existingCountryOpt.isPresent()) {
+                // Update existing country if any field changed
+                Country existingCountry = existingCountryOpt.get();
+                boolean updated = false;
+                if (!Objects.equals(existingCountry.getName(), name)) {
+                    existingCountry.setName(name);
+                    updated = true;
+                }
+                if (!Objects.equals(existingCountry.getFlagUrl(), flagUrl)) {
+                    existingCountry.setFlagUrl(flagUrl);
+                    updated = true;
+                }
+                if (updated) {
+                    countryRepository.save(existingCountry);
+                    logger.debug("Updated country: {} ({})", name, code);
+                }
+            } else {
+                // Insert new country
+                Country newCountry = new Country(name, code);
+                newCountry.setFlagUrl(flagUrl);
+                countryRepository.save(newCountry);
+                logger.debug("Created country: {} ({})", name, code);
+            }
+        } catch (Exception e) {
+            logger.error("Error creating/updating country from metadata {}: {}", countryNode, e.getMessage(), e);
         }
-    } catch (Exception e) {
-        logger.error("Error creating country from metadata {}: {}", countryNode, e.getMessage(), e);
     }
-}
+
 
     @Override
     public List<Channel> getAllChannels() {
